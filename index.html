@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario de bebidas</title>
+    <link rel="stylesheet" href="proyecto.css">
+</head>
+<body>
+
+    <header>
+        <h1>Inventario de bebidas</h1>
+        <nav>
+            <button onclick="cambiarPestaña('catalogo', this)" class="pestañaBtn activo">Catálogo</button>
+            <button onclick="cambiarPestaña('admin', this)" class="pestañaBtn">Administración de stock</button>
+            <button onclick="cambiarPestaña('proveedores', this)" class="pestañaBtn">Proveedores</button>
+            <button onclick="cambiarPestaña('archivos', this)" class="pestañaBtn">Registros</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="vistaCatalogo" class="vista activa">
+            <h2>Catálogo de bebidas disponibles</h2>
+            
+            <div class="categoriasGrid">
+                <button onclick="filtrarCategoria('todos')" class="botonCat">Todas</button>
+                <button onclick="filtrarCategoria('Gaseosa')" class="botonCat">Gaseosas</button>
+                <button onclick="filtrarCategoria('Jugo')" class="botonCat">Jugos</button>
+                <button onclick="filtrarCategoria('Agua')" class="botonCat">Aguas</button>
+                <button onclick="filtrarCategoria('Energizante')" class="botonCat">Energizantes</button>
+            </div>
+
+            <div class="buscadorContenedor">
+                <input type="text" id="buscador" placeholder="Buscar por nombre o marca" oninput="filtrarCatalogo()">
+            </div>
+
+            <div id="contenedorTarjetas" class="catalogoGrid"></div>
+        </section>
+
+        <section id="vistaAdmin" class="vista">
+            <h2>Gestionar Inventario</h2>
+            <form id="formAdmin" onsubmit="event.preventDefault(); guardarProducto();">
+                <div class="campoForm">
+                    <label>Código:</label>
+                    <input type="text" id="prodId" maxlength="5" required placeholder="Ej: G04">
+                </div>
+                <div class="campoForm">
+                    <label>Nombre de la Bebida:</label>
+                    <input type="text" id="prodNombre" required placeholder="Nombre comercial">
+                </div>
+                <div class="campoForm">
+                    <label>Categoría:</label>
+                    <select id="prodCategoriaSelect" required>
+                        <option value="Gaseosa">Gaseosa</option>
+                        <option value="Jugo">Jugo</option>
+                        <option value="Agua">Agua</option>
+                        <option value="Energizante">Energizante</option>
+                    </select>
+                </div>
+                <div class="campoForm">
+                    <label>Marca:</label>
+                    <input type="text" id="prodMarca" required placeholder="Marca fabricante">
+                </div>
+
+                <div class="campoForm">
+                    <label>Litros:</label>
+                    <select id="prodLitros">
+                        <option value="0.5">0.5 L (500ml)</option>
+                        <option value="1.0">1.0 L Litro</option>
+                        <option value="1.5">1.5 Litros</option>
+                        <option value="2.0">2.0 Litros</option>
+                        <option value="3.0">3.0 Litros</option>
+                        <option value="6.0">6.0 Litros (Botellón Agua)</option>
+                    </select>
+                </div>
+
+                <div class="campoForm">
+                    <label>Precio Costo (Bs):</label>
+                    <input type="number" id="prodCosto" step="0.1" min="0" required placeholder="0.0">
+                </div>
+                <div class="campoForm">
+                    <label>Precio Venta (Bs):</label>
+                    <input type="number" id="prodVenta" step="0.1" min="0" required placeholder="0.0">
+                </div>
+                <div class="campoForm">
+                    <label>Stock Actual:</label>
+                    <input type="number" id="prodStock" min="0" step="1" required placeholder="Cantidad">
+                </div>
+                <div class="campoForm">
+                    <label>Proveedor:</label>
+                    <select id="prodProveedor" required>
+                        <option value="">Seleccione un proveedor</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="btnAccionForm" class="botonAzul">Registrar Producto</button>
+                <button type="button" id="btnCancelarForm" onclick="limpiarFormularioProducto()" class="botonNaranja margenIzquierda botonCancelar">Cancelar Edición</button>
+                <p id="mensajeAdmin" class="mensajeEstado"></p>
+            </form>
+
+            <h3>Listado general de stock</h3>
+            <table class="tablaDatos">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Detalle</th>
+                        <th>Costo</th>
+                        <th>Venta</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaInventario"></tbody>
+            </table>
+        </section>
+
+        <section id="vistaProveedores" class="vista">
+            <h2>Gestionar Proveedores</h2>
+            <form id="formProveedores" onsubmit="event.preventDefault(); guardarProveedor();">
+                <div class="campoForm">
+                    <label>Nombre de la Empresa:</label>
+                    <input type="text" id="provNombre" required placeholder="Nombre de empresa">
+                </div>
+                <div class="campoForm">
+                    <label>Teléfono de Contacto (7 a 10 dígitos):</label>
+                    <input type="text" id="provTelefono" minlength="7" maxlength="10" required placeholder="Ej: 70011223">
+                </div>
+                <div class="campoForm">
+                    <label>Categoría Suministrada:</label>
+                    <input type="text" id="provCategoria" required placeholder="Ej: Gaseosas y Cervezas">
+                </div>
+                <button type="submit" id="btnAccionProveedor" class="botonAzul">Guardar Proveedor</button>
+                <button type="button" id="btnCancelarProveedor" onclick="limpiarFormularioProveedor()" class="botonNaranja margenIzquierda botonCancelar">Cancelar Edición</button>
+                
+                <p id="mensajeProveedor" style="margin-top: 10px; font-weight: bold;"></p>
+            </form>
+            
+            <table class="tablaDatos tablaSeparada">
+                <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Teléfono</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaProveedores"></tbody>
+            </table>
+        </section>
+
+        <section id="vistaArchivos" class="vista">
+            <h2>Guardar registros</h2>
+            <p>Guarda tu inventario o importalo</p>
+            <div>
+                <button onclick="exportarDatosJSON()" class="botonVerde">Descargar Datos (JSON)</button>
+                <label class="botonAzul">
+                    Cargar Archivo JSON <input type="file" id="inputArchivo" accept=".json" onchange="importarDatosJSON(event)" class="ocultoInput">
+                </label>
+                <button onclick="exportarCSV()" class="botonNaranja">Exportar Reporte a CSV</button>
+            </div>
+            <p id="mensajeArchivo" class="mensajeArchivo">Listo para cualquier acción</p>
+        </section>
+    </main>
+    <script src="proyecto.js"></script>
+</body>
+</html>
